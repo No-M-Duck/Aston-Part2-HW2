@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+         version="5.0">
+
+    <display-name>HW2</display-name>
+
+    <listener>
+        <listener-class>org.example.controllers.MyAppContextListener</listener-class>
+    </listener>
+
+
+    <servlet>
+        <servlet-name>DirectorServlet</servlet-name>
+        <servlet-class>org.example.controllers.DirectorServlet</servlet-class>
+    </servlet>
+
+    <!-- Сопоставление сервлета с URL -->
+    <servlet-mapping>
+        <servlet-name>DirectorServlet</servlet-name>
+        <url-pattern>/directors/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>MovieServlet</servlet-name>
+        <servlet-class>org.example.controllers.MovieServlet</servlet-class>
+    </servlet>
+
+    <!-- Сопоставление сервлета с URL -->
+    <servlet-mapping>
+        <servlet-name>MovieServlet</servlet-name>
+        <url-pattern>/movies/*</url-pattern>
+    </servlet-mapping>
+
+
+
+</web-app>
