@@ -1,6 +1,7 @@
 package org.example.dto;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 public class MovieDTO {
@@ -80,5 +81,18 @@ public class MovieDTO {
                 ", duration=" + duration +
                 ", hall=" + hall +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MovieDTO movieDTO = (MovieDTO) o;
+        return duration == movieDTO.duration && hall == movieDTO.hall && Objects.equals(id, movieDTO.id) && Objects.equals(directorId, movieDTO.directorId) && Objects.equals(title, movieDTO.title) && Objects.equals(releaseDate, movieDTO.releaseDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, directorId, title, releaseDate, duration, hall);
     }
 }

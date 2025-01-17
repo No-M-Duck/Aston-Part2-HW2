@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-public class BaseTestIntegration {
+public class BaseIntegrationTest {
     private static PostgreSQLContainer<?> container;
 
     @BeforeAll

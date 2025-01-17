@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Movie {
@@ -80,5 +81,18 @@ public class Movie {
                 ", duration=" + duration +
                 ", hall=" + hall +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Movie movie = (Movie) o;
+        return duration == movie.duration && hall == movie.hall && Objects.equals(id, movie.id) && Objects.equals(directorId, movie.directorId) && Objects.equals(title, movie.title) && Objects.equals(releaseDate, movie.releaseDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, directorId, title, releaseDate, duration, hall);
     }
 }

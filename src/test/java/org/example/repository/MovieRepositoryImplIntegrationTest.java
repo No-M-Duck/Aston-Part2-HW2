@@ -1,6 +1,6 @@
 package org.example.repository;
 
-import org.example.BaseTestIntegration;
+import org.example.BaseIntegrationTest;
 import org.example.entity.Director;
 import org.example.entity.Movie;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
-class MovieRepositoryImplTestIntegration extends BaseTestIntegration {
+class MovieRepositoryImplIntegrationTest extends BaseIntegrationTest {
 
     private final MovieRepositoryImpl movieRepositoryImpl = new MovieRepositoryImpl();
     private final DirectorRepositoryImpl directorRepositoryImpl = new DirectorRepositoryImpl();
@@ -31,6 +31,17 @@ class MovieRepositoryImplTestIntegration extends BaseTestIntegration {
 
     @Test
     void create() {
+
+        Movie movie = new Movie(null, directorId, "Jaws", LocalDate.of(1975, 6, 20), 124, 1);
+        boolean isCreated = movieRepositoryImpl.create(movie);
+
+        assertTrue(isCreated, "Movie should be successfully created");
+        assertNotNull(movie.getId(), "Movie ID should be assigned by the database");
+
+    }
+
+    @Test
+    void createSQLExc() {
 
         Movie movie = new Movie(null, directorId, "Jaws", LocalDate.of(1975, 6, 20), 124, 1);
         boolean isCreated = movieRepositoryImpl.create(movie);

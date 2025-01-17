@@ -1,6 +1,6 @@
 package org.example.repository;
 
-import org.example.BaseTestIntegration;
+import org.example.BaseIntegrationTest;
 import org.example.entity.Director;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class DirectorRepositoryImplTestIntegration extends BaseTestIntegration {
+class DirectorRepositoryImplIntegrationTest extends BaseIntegrationTest {
 
     private final DirectorRepositoryImpl directorRepositoryImpl = new DirectorRepositoryImpl();
 

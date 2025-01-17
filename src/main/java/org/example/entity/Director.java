@@ -1,5 +1,6 @@
 package org.example.entity;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class Director {
@@ -61,5 +62,18 @@ public class Director {
                 ", lastName='" + lastName + '\'' +
                 ", country='" + country + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Director director = (Director) o;
+        return Objects.equals(id, director.id) && Objects.equals(name, director.name) && Objects.equals(lastName, director.lastName) && Objects.equals(country, director.country);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, lastName, country);
     }
 }

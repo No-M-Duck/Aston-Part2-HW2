@@ -5,6 +5,8 @@ import org.example.entity.Director;
 
 public class DirectorMapperImpl implements DirectorMapper {
 
+
+
     public DirectorDTO toDTO(Director director) {
         return new DirectorDTO(
                 director.getId(),
