@@ -19,9 +19,10 @@ public class DbUtils {
             init();
         }
     }
-    public static void startTest(){
+    public static void startTest(boolean servlet){
         pgcrypto();
         init();
+        if(servlet){populateInitialTestData();}
     }
 
 
@@ -101,6 +102,25 @@ public class DbUtils {
                     ")");
         } catch (SQLException e) {
             logger.error("Failed to init tables to the database{}", e.getMessage(), e);
+        }
+    }
+
+    private static void populateInitialTestData() {
+        String insertDirectorsSql = "INSERT INTO directors (id, name, last_name, country) VALUES " +
+                "('550e8400-e29b-41d4-a716-446655440000', 'Steven', 'Spielberg', 'USA'), " +
+                "('550e8400-e29b-41d4-a716-446655440001', 'Christopher', 'Nolan', 'UK') ";
+
+        String insertMoviesSql = "INSERT INTO movies (id, director_id, title, release_date, duration, hall) VALUES " +
+                "('660e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440000', 'Jurassic Park', '1993-06-11', 127, 1), " +
+                "('660e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440001', 'Inception', '2010-07-16', 148, 2)";
+
+        try (Connection connection = DataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.executeUpdate(insertDirectorsSql);
+            statement.executeUpdate(insertMoviesSql);
+            logger.info("Initial test data inserted successfully");
+        } catch (SQLException e) {
+            logger.error("Failed to insert initial test data: {}", e.getMessage(), e);
         }
     }
 }

@@ -49,6 +49,10 @@ public class DirectorServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         try {
             DirectorDTO director = new Gson().fromJson(req.getReader(), DirectorDTO.class);
             boolean created = directorServiceImpl.createEntity(director);
@@ -69,6 +73,8 @@ public class DirectorServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         try {
             DirectorDTO director = new Gson().fromJson(req.getReader(), DirectorDTO.class);
             boolean updated = directorServiceImpl.updateEntity(director);
@@ -88,6 +94,8 @@ public class DirectorServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         try {
             // Получение ID из URL
             String pathInfo = req.getPathInfo(); // Получает часть пути после "/directors"
