@@ -34,6 +34,10 @@ public class MovieServlet extends HttpServlet {
         this.movieServiceImpl = new MovieServiceImpl(new MovieRepositoryImpl(), new MovieMapperImpl());
     }
 
+    public MovieServlet(MovieServiceImpl movieServiceImpl) {
+        this.movieServiceImpl = movieServiceImpl;
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String movieId = req.getParameter("id");
@@ -68,7 +72,8 @@ public class MovieServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.getWriter().write("{\"message\": \"Movie created successfully\"}");
             } else {
-                throw new IllegalStateException("Failed to create movie");
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"error\": \"Failed to create movie\"}");
             }
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -86,7 +91,8 @@ public class MovieServlet extends HttpServlet {
             if (updated) {
                 resp.getWriter().write("{\"message\": \"Movie updated successfully\"}");
             } else {
-                throw new IllegalStateException("Failed to update movie");
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write("{\"error\": \"Failed to update movie\"}");
             }
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -96,6 +102,7 @@ public class MovieServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp = settingResp(resp);
         try {
             String pathInfo = req.getPathInfo();
             if (pathInfo == null || pathInfo.length() <= 1) {

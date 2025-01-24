@@ -17,6 +17,10 @@ public class DirectorRepositoryImpl implements DirectorRepository {
 
     private final DataSource dataSource;
 
+    public DirectorRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     public DirectorRepositoryImpl() {
         this.dataSource = new DataSource();
     }

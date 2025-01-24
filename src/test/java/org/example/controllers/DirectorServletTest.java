@@ -48,56 +48,22 @@ class DirectorServletTest {
     @Mock
     DirectorServiceImpl service;
 
-    @Mock
-    DirectorRepositoryImpl repository;
-
-    @Mock
-    DirectorMapperImpl mapper;
-
     @InjectMocks
     DirectorServlet servlet;
 
     private Gson gson;
 
-
-
-    private static PostgreSQLContainer<?> container =new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.3"));
-
-   /* @BeforeAll
-    public static void beforeAll() {
-        container
-                .withDatabaseName("testdb")
-                .withUsername("test")
-                .withPassword("test")
-                .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(1)));
-        container.start();
-
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(container.getJdbcUrl());
-        config.setUsername(container.getUsername());
-        config.setPassword(container.getPassword());
-        DataSource.init(config);
-        DbUtils.startTest(true);
-
-    }
-*/
     //Director director = new Director(directorId, "Christopher", "Nolan", "UK");
     @BeforeEach
     public void setUp() {
+        servlet = new DirectorServlet(service);
         gson = new Gson();
 
     }
 
     @Test
-    @Order(1)
     void doGet() throws IOException, ServletException {
-        when(repository.findById(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")))
-                .thenReturn(Optional.of(new Director(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA")));
-
         DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
-
-        when(mapper.toDTO(any(Director.class)))
-                .thenReturn(director1);
 
         when(service.findEntityById(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")))
                 .thenReturn(Optional.of(director1));
@@ -129,11 +95,6 @@ class DirectorServletTest {
         DirectorDTO directorDto2 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440001"), "Christopher", "Nolan", "UK");
         List<DirectorDTO> dtos = List.of(directorDto1, directorDto2);
 
-        Director director1 = new Director(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
-        Director director2 = new Director(UUID.fromString("550e8400-e29b-41d4-a716-446655440001"), "Christopher", "Nolan", "UK");
-        List<Director> ents = List.of(director1, director2);
-
-        when(repository.findAll()).thenReturn(ents);
 
         when(service.findAllEntity()).thenReturn(dtos);
 
@@ -160,13 +121,6 @@ class DirectorServletTest {
     @Test
     @Order(3)
     void doGetNotFound() throws IOException, ServletException {
-        when(repository.findById(UUID.fromString("550e8400-e29b-41d4-a716-446655440003")))
-                .thenReturn(Optional.empty());
-        DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
-
-        when(mapper.toDTO(any(Director.class)))
-                .thenReturn(new DirectorDTO(null,null,null,null));
-
         when(service.findEntityById(UUID.fromString("550e8400-e29b-41d4-a716-446655440003")))
                 .thenReturn(Optional.empty());
 
@@ -193,13 +147,7 @@ class DirectorServletTest {
     @Order(4)
     void doPost() throws IOException, ServletException {
 
-        when(repository.create(new Director("Steven","Spielberg","USA"))).thenReturn(true);
-        when(mapper.toDTO(any(Director.class)))
-                .thenReturn(new DirectorDTO(
-                        UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
-                        "Steven", "Spielberg", "USA"));
-
-        when(service.createEntity(new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA")))
+        when(service.createEntity(any()))
                 .thenReturn(true);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -230,9 +178,6 @@ class DirectorServletTest {
                 UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
                 "Steven", "Spielberg", "USA"
         );
-
-        when(repository.create(any())).thenReturn(false);
-        when(mapper.toEntity(any())).thenReturn(new Director("Steven", "Spielberg", "USA"));
         when(service.createEntity(any())).thenReturn(false);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -256,11 +201,12 @@ class DirectorServletTest {
         assertEquals("{\"error\": \"Failed to create director\"}",sw.toString());
 
     }
-/*
+
+
+
     @Test
-    @Order(5)
+    @Order(6)
     void doPut() throws IOException, ServletException {
-        when(repository.update(new Director("Steven","Spielberg","USA"))).thenReturn(true);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -290,14 +236,43 @@ class DirectorServletTest {
     }
 
     @Test
-    @Order(5)
+    @Order(6)
+    void doPutNoUpdated() throws IOException, ServletException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        StringReader reader = new StringReader("{" +
+                "\"id\":\"550e8400-e29b-41d4-a716-446655440000\","+
+                "\"name\":\"Quentin\"," +
+                " \"lastName\":\"Tarantino\"," +
+                " \"country\":\"USA\"}");
+
+        when(request.getReader()).thenReturn(new BufferedReader(reader));
+
+        when(service.updateEntity(any())).thenReturn(false);
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        when(response.getWriter()).thenReturn(pw);
+
+
+        servlet.doPut(request,response);
+
+        verify(response).setContentType("application/json");
+
+        assertEquals("{\"error\": \"Failed to update director\"}",sw.toString());
+    }
+
+    @Test
+    @Order(7)
     void doDelete() throws ServletException, IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
         when(request.getPathInfo()).thenReturn("/550e8400-e29b-41d4-a716-446655440000");
 
-        when(service.deleteEntity(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"))).thenReturn(true);
+        when(service.deleteEntity(any())).thenReturn(true);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -312,37 +287,47 @@ class DirectorServletTest {
         assertEquals("{\"message\": \"Director deleted successfully\"}",sw.toString());
     }
 
-
     @Test
-    @Order(6)
-    void doPostNoSave() throws IOException, ServletException {
-
-        // �������� ������ � �����
+    @Order(8)
+    void doDeleteFail() throws ServletException, IOException {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        // �������������� JSON ��� �������� ������
-        StringReader reader = new StringReader("{\"name\":\"Steven\", \"lastName\":\"Spielberg\", \"country\":\"USA\"}");
-        when(request.getReader()).thenReturn(new BufferedReader(reader));
+        when(request.getPathInfo()).thenReturn("/550e8400-e29b-41d4-a716-446655440000");
 
-        // ������������ ��������� �������
-        when(service.createEntity(any(DirectorDTO.class))).thenReturn(false);
+        when(service.deleteEntity(any())).thenReturn(false);
 
-        // �������� writer ��� ������
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
+
         when(response.getWriter()).thenReturn(pw);
 
-        // �������� doPost
-        servlet.doPost(request, response);
 
-        // ��������� ��������� ������
+        servlet.doDelete(request,response);
+
         verify(response).setContentType("application/json");
 
-        // ��������� ���������� ������
-        pw.flush(); // ����������� ���������� writer
-        assertEquals("{\"error\": \"Failed to create director\"}", sw.toString());
+        assertEquals("{\"error\": \"Failed to delete director\"}",sw.toString());
     }
 
-     */
+    @Test
+    @Order(8)
+    void doDeletePathFail() throws ServletException, IOException {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        when(request.getPathInfo()).thenReturn(null);
+
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        when(response.getWriter()).thenReturn(pw);
+
+        servlet.doDelete(request,response);
+
+        verify(response).setContentType("application/json");
+
+        assertEquals("{\"error\": \"Director ID is required\"}",sw.toString());
+    }
 }

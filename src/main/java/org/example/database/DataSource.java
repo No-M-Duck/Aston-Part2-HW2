@@ -11,11 +11,17 @@ import java.sql.SQLException;
 public class DataSource {
     private static final Logger logger = LoggerUtil.getLogger(DataSource.class);
     private final HikariDataSource dataSource;
-    private final HikariConfig config = new HikariConfig("datasource.properties");
 
-    public DataSource() {
+    private static final String DEFAULT_DATABASE_PROPERTIES = "datasource.properties";
+    private  HikariConfig config;
+
+    public DataSource(HikariConfig config) {
         this.config = config;
         this.dataSource = new HikariDataSource(config);
+    }
+
+    public DataSource() {
+        this.dataSource = new HikariDataSource(new HikariConfig(DEFAULT_DATABASE_PROPERTIES));
     }
 
     public Connection getConnection() throws SQLException {

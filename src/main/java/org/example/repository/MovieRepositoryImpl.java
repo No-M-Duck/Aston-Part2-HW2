@@ -15,6 +15,10 @@ public class MovieRepositoryImpl implements MovieRepository {
 
     private final DataSource dataSource;
 
+    public MovieRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     public MovieRepositoryImpl() {
         this.dataSource = new DataSource();
     }

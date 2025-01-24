@@ -8,6 +8,8 @@ import org.example.repository.DirectorRepository;
 import org.example.repository.DirectorRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -17,9 +19,13 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+
 class DirectorServiceImplTest {
+    @Mock
     private DirectorRepository directorRepository;
+    @Mock
     private DirectorMapper directorMapper;
+    @InjectMocks
     private DirectorService directorService;
 
     @BeforeEach

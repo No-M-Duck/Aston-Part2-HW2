@@ -19,7 +19,7 @@ public class MyAppContextListener implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         try {
             logger.info("Initializing application context...");
-            dataSource.init();
+           // dataSource.init();
             DbUtils.start(dataSource);
             logger.info("Application context initialized successfully.");
         } catch (Exception e) {

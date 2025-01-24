@@ -24,6 +24,10 @@ public class DirectorServlet extends HttpServlet {
         this.directorServiceImpl = new DirectorServiceImpl(new DirectorRepositoryImpl(), new DirectorMapperImpl());
     }
 
+    public DirectorServlet(DirectorServiceImpl directorServiceImpl) {
+        this.directorServiceImpl = directorServiceImpl;
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String directorId = req.getParameter("id");
@@ -65,7 +69,7 @@ public class DirectorServlet extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().write("{\"error\": \"Failed to create director\"}");
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write(String.format(ERROR_TEMPLATE, e.getMessage()));
 

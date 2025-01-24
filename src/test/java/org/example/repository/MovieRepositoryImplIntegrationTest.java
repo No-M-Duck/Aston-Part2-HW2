@@ -5,11 +5,9 @@ import org.example.database.DataSource;
 import org.example.database.DbUtils;
 import org.example.entity.Director;
 import org.example.entity.Movie;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
@@ -20,14 +18,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
-
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MovieRepositoryImplIntegrationTest {
 
 
+
     private  MovieRepositoryImpl movieRepositoryImpl;
+
     private DirectorRepositoryImpl directorRepositoryImpl;
 
-    private final DataSource dataSource = new DataSource();
+    private  DataSource dataSource;
 
 
     private UUID directorId;
@@ -35,6 +36,7 @@ class MovieRepositoryImplIntegrationTest {
     private static PostgreSQLContainer<?> container =new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.3")).withDatabaseName("testdb")
             .withUsername("test")
             .withPassword("test")
+            .withInitScript("test.sql")
             .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(1)));
 
     @BeforeAll
@@ -45,22 +47,16 @@ class MovieRepositoryImplIntegrationTest {
         config.setUsername(container.getUsername());
         config.setPassword(container.getPassword());
 
-        dataSource.init(config);
-        DbUtils.startTest(dataSource);
-    }
+        dataSource = new DataSource(config);
 
-    @BeforeEach
-    public void setUp(){
-        directorRepositoryImpl = new DirectorRepositoryImpl();
-        movieRepositoryImpl = new MovieRepositoryImpl();
+        movieRepositoryImpl = new MovieRepositoryImpl(dataSource);
+        directorRepositoryImpl = new DirectorRepositoryImpl(dataSource);
 
-
-
-        var director = new Director("Steven", "Spielberg", "USA");
+        Director director = new Director("Quentin ", "Tarantino", "USA");
         directorRepositoryImpl.create(director);
         directorId = director.getId();
 
-        assertNotNull(directorId, "Director ID should not be null after creation");
+
     }
 
     @AfterAll
@@ -71,7 +67,7 @@ class MovieRepositoryImplIntegrationTest {
     @Test
     void create() {
 
-        Movie movie = new Movie(null, directorId, "Jaws", LocalDate.of(1975, 6, 20), 124, 1);
+        Movie movie = new Movie(null, directorId, "Pulp Fiction", LocalDate.of(1994, 6, 20), 154, 1);
         boolean isCreated = movieRepositoryImpl.create(movie);
 
         assertTrue(isCreated, "Movie should be successfully created");

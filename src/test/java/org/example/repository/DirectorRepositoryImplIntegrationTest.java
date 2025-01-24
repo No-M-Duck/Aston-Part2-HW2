@@ -7,6 +7,7 @@ import org.example.database.DbUtils;
 import org.example.entity.Director;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
@@ -21,15 +22,17 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DirectorRepositoryImplIntegrationTest {
 
+    @InjectMocks
     private DirectorRepositoryImpl directorRepositoryImpl;
 
-    private final DataSource dataSource = new DataSource();
+    private DataSource dataSource;
 
     private UUID directorId;
     private static final PostgreSQLContainer<?> container =new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.3"))
             .withDatabaseName("testdb")
             .withUsername("test")
             .withPassword("test")
+            .withInitScript("test.sql") //скрипт из файлика
             .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3)));
 
 
@@ -42,14 +45,9 @@ class DirectorRepositoryImplIntegrationTest {
         config.setUsername(container.getUsername());
         config.setPassword(container.getPassword());
 
-        dataSource.init(config);
+        dataSource = new DataSource(config);
 
-        directorRepositoryImpl = new DirectorRepositoryImpl();
-    }
-
-    @BeforeEach
-    public void setUp(){
-
+        directorRepositoryImpl = new DirectorRepositoryImpl(dataSource);
     }
 
     @AfterAll
@@ -71,7 +69,6 @@ class DirectorRepositoryImplIntegrationTest {
         assertEquals(director.getName(), retrievedDirector.get().getName());
         assertEquals(director.getLastName(), retrievedDirector.get().getLastName());
         assertEquals(director.getCountry(), retrievedDirector.get().getCountry());
-        System.out.println("create complete");
     }
 
     @Test
