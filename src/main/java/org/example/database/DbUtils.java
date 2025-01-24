@@ -13,23 +13,23 @@ public class DbUtils {
 
     private static final Logger logger = LoggerUtil.getLogger(DbUtils.class);
 
-    public static void start(){
-        pgcrypto();
-        if(!checkTables()){
-            init();
+    public static void start(DataSource dataSource){
+        pgcrypto(dataSource);
+        if(!checkTables(dataSource)){
+            init(dataSource);
         }
     }
-    public static void startTest(boolean servlet){
-        pgcrypto();
-        init();
-        if(servlet){populateInitialTestData();}
+    public static void startTest(DataSource dataSource){
+        pgcrypto(dataSource);
+        init(dataSource);
+       // if(servlet){populateInitialTestData();}
     }
 
 
 
 
-    private static void pgcrypto() {
-        try (Connection connection = DataSource.getConnection();
+    private static void pgcrypto(DataSource dataSource) {
+        try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             statement.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto;");
             logger.info("pgcrypto successfully installed in the database");
@@ -38,8 +38,8 @@ public class DbUtils {
         }
     }
 
-    private static boolean checkTables() {
-        try (Connection connection = DataSource.getConnection();
+    private static boolean checkTables(DataSource dataSource) {
+        try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
 
             logger.info("Check tables in database");
@@ -81,8 +81,8 @@ public class DbUtils {
     }
 
 
-    private static void init() {
-        try (Connection connection = DataSource.getConnection();
+    private static void init(DataSource dataSource) {
+        try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             logger.info("Initializing tables in the database");
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS directors(" +
@@ -105,7 +105,7 @@ public class DbUtils {
         }
     }
 
-    private static void populateInitialTestData() {
+    private static void populateInitialTestData(DataSource dataSource) {
         String insertDirectorsSql = "INSERT INTO directors (id, name, last_name, country) VALUES " +
                 "('550e8400-e29b-41d4-a716-446655440000', 'Steven', 'Spielberg', 'USA'), " +
                 "('550e8400-e29b-41d4-a716-446655440001', 'Christopher', 'Nolan', 'UK') ";
@@ -114,7 +114,7 @@ public class DbUtils {
                 "('660e8400-e29b-41d4-a716-446655440000', '550e8400-e29b-41d4-a716-446655440000', 'Jurassic Park', '1993-06-11', 127, 1), " +
                 "('660e8400-e29b-41d4-a716-446655440001', '550e8400-e29b-41d4-a716-446655440001', 'Inception', '2010-07-16', 148, 2)";
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement()) {
             statement.executeUpdate(insertDirectorsSql);
             statement.executeUpdate(insertMoviesSql);

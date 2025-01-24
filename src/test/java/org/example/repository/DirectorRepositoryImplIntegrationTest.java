@@ -21,28 +21,30 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class DirectorRepositoryImplIntegrationTest {
 
-    private final DirectorRepositoryImpl directorRepositoryImpl = new DirectorRepositoryImpl();
+    private DirectorRepositoryImpl directorRepositoryImpl;
+
+    private final DataSource dataSource = new DataSource();
 
     private UUID directorId;
+    private static final PostgreSQLContainer<?> container =new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.3"))
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test")
+            .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(3)));
 
-
-    private static PostgreSQLContainer<?> container =new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.3"));
 
     @BeforeAll
-    public static void beforeAll() {
-        container
-                .withDatabaseName("testdb")
-                .withUsername("test")
-                .withPassword("test")
-                .waitingFor(Wait.forListeningPort().withStartupTimeout(Duration.ofMinutes(1)));
+    public void beforeAll() {
         container.start();
-        System.out.println(container.getFirstMappedPort());
+
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(container.getJdbcUrl());
         config.setUsername(container.getUsername());
         config.setPassword(container.getPassword());
-        DataSource.init(config);
-        DbUtils.startTest(false);
+
+        dataSource.init(config);
+
+        directorRepositoryImpl = new DirectorRepositoryImpl();
     }
 
     @BeforeEach

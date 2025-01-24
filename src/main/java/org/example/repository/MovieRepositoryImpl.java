@@ -1,5 +1,6 @@
 package org.example.repository;
 
+import org.example.controllers.MyAppContextListener;
 import org.example.database.DataSource;
 import org.example.entity.Movie;
 
@@ -11,10 +12,17 @@ import java.util.UUID;
 
 
 public class MovieRepositoryImpl implements MovieRepository {
+
+    private final DataSource dataSource;
+
+    public MovieRepositoryImpl() {
+        this.dataSource = new DataSource();
+    }
+
     @Override
     public boolean create(Movie entity) {
         String sql = "INSERT INTO movies (director_id, title, release_date, duration, hall) VALUES (?, ?, ?, ?, ?) RETURNING id";
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setObject(1, entity.getDirectorId());
@@ -38,7 +46,7 @@ public class MovieRepositoryImpl implements MovieRepository {
     public Optional<Movie> findById(UUID id) {
         String sql = "SELECT * FROM movies WHERE id = ?";
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setObject(1, id);
@@ -58,7 +66,7 @@ public class MovieRepositoryImpl implements MovieRepository {
         String sql = "SELECT * FROM movies";
         List<Movie> movies = new ArrayList<>();
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
 
@@ -75,7 +83,7 @@ public class MovieRepositoryImpl implements MovieRepository {
     public boolean update(Movie entity) {
         String sql = "UPDATE movies SET director_id = ?, title = ?, release_date = ?, duration = ?, hall = ? WHERE id = ?";
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setObject(1, entity.getDirectorId());
@@ -96,7 +104,7 @@ public class MovieRepositoryImpl implements MovieRepository {
     public boolean delete(UUID id) {
         String sql = "DELETE FROM movies WHERE id = ?";
 
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setObject(1, id);

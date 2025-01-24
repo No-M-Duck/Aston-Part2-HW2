@@ -12,13 +12,15 @@ import org.slf4j.LoggerFactory;
 public class MyAppContextListener implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(MyAppContextListener.class);
 
+    private final DataSource dataSource = new DataSource();
+
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
             logger.info("Initializing application context...");
-            HikariConfig config = new HikariConfig("datasource.properties");
-            DataSource.init(config);
-            DbUtils.start();
+            dataSource.init();
+            DbUtils.start(dataSource);
             logger.info("Application context initialized successfully.");
         } catch (Exception e) {
             logger.error("Error initializing application context", e);
@@ -30,7 +32,7 @@ public class MyAppContextListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         try {
             logger.info("Destroying application context...");
-            DataSource.close();
+            dataSource.close();
             logger.info("Application context destroyed successfully.");
         } catch (Exception e) {
             logger.error("Error destroying application context", e);

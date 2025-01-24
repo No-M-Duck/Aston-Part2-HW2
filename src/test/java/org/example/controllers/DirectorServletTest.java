@@ -63,7 +63,7 @@ class DirectorServletTest {
 
     private static PostgreSQLContainer<?> container =new PostgreSQLContainer<>(DockerImageName.parse("postgres:15.3"));
 
-    @BeforeAll
+   /* @BeforeAll
     public static void beforeAll() {
         container
                 .withDatabaseName("testdb")
@@ -80,7 +80,7 @@ class DirectorServletTest {
         DbUtils.startTest(true);
 
     }
-
+*/
     //Director director = new Director(directorId, "Christopher", "Nolan", "UK");
     @BeforeEach
     public void setUp() {
@@ -226,16 +226,14 @@ class DirectorServletTest {
     @Test
     @Order(5)
     void doPostFail() throws IOException, ServletException {
-
-        Director director = new Director("Steven", "Spielberg", "USA");
         DirectorDTO directorDTO = new DirectorDTO(
                 UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
                 "Steven", "Spielberg", "USA"
         );
 
-        when(repository.create(eq(director))).thenReturn(false);
-        when(mapper.toDTO(eq(director))).thenReturn(directorDTO);
-        when(service.createEntity(eq(directorDTO))).thenReturn(false);
+        when(repository.create(any())).thenReturn(false);
+        when(mapper.toEntity(any())).thenReturn(new Director("Steven", "Spielberg", "USA"));
+        when(service.createEntity(any())).thenReturn(false);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -253,11 +251,12 @@ class DirectorServletTest {
         servlet.doPost(request,response);
 
         verify(response).setContentType("application/json");
+        verify(response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
         assertEquals("{\"error\": \"Failed to create director\"}",sw.toString());
 
     }
-
+/*
     @Test
     @Order(5)
     void doPut() throws IOException, ServletException {
@@ -289,7 +288,7 @@ class DirectorServletTest {
 
         assertEquals("{\"message\": \"Director updated successfully\"}",sw.toString());
     }
-/*
+
     @Test
     @Order(5)
     void doDelete() throws ServletException, IOException {

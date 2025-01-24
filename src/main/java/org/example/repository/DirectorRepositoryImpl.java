@@ -1,5 +1,6 @@
 package org.example.repository;
 
+import org.example.controllers.MyAppContextListener;
 import org.example.database.DataSource;
 import org.example.entity.Director;
 
@@ -14,9 +15,15 @@ import java.util.UUID;
 
 public class DirectorRepositoryImpl implements DirectorRepository {
 
+    private final DataSource dataSource;
+
+    public DirectorRepositoryImpl() {
+        this.dataSource = new DataSource();
+    }
+
     public boolean create(Director director) {
         String sql = "INSERT INTO directors ( name, last_name, country) VALUES (?, ?, ?) RETURNING id";
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, director.getName());
             statement.setString(2, director.getLastName());
@@ -39,7 +46,7 @@ public class DirectorRepositoryImpl implements DirectorRepository {
     @Override
     public Optional<Director> findById(UUID id) {
         String sql = "SELECT * FROM directors where id=?";
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -57,7 +64,7 @@ public class DirectorRepositoryImpl implements DirectorRepository {
     public List<Director> findAll() {
         String sql = "SELECT * FROM directors";
         List<Director> directors = new ArrayList<>();
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
@@ -73,7 +80,7 @@ public class DirectorRepositoryImpl implements DirectorRepository {
     @Override
     public boolean update(Director entity) {
         String sql = "UPDATE directors SET name = ?, last_name = ?, country = ? WHERE id=?";
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, entity.getName());
             statement.setString(2, entity.getLastName());
@@ -90,7 +97,7 @@ public class DirectorRepositoryImpl implements DirectorRepository {
     @Override
     public boolean delete(UUID id) {
         String sql = "DELETE FROM directors WHERE id =?";
-        try (Connection connection = DataSource.getConnection();
+        try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setObject(1, id);
             return statement.executeUpdate() > 0;
