@@ -48,7 +48,7 @@ public class DirectorRepositoryImpl implements DirectorRepository {
             }
 
         } catch (SQLException sqlException) {
-            logger.error("Error creating director: {}", sqlException.getMessage(), sqlException);
+            logger.error("Error found director: {}", sqlException.getMessage(), sqlException);
         }
         return Optional.empty();
     }

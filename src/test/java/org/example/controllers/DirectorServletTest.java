@@ -8,6 +8,7 @@ import org.example.database.DbUtils;
 import org.example.dto.DirectorDTO;
 import org.example.entity.Director;
 import org.example.mapper.DirectorMapper;
+import org.example.mapper.DirectorMapperImpl;
 import org.example.repository.DirectorRepositoryImpl;
 import org.example.service.DirectorServiceImpl;
 
@@ -47,6 +48,12 @@ class DirectorServletTest {
     @Mock
     DirectorServiceImpl service;
 
+    @Mock
+    DirectorRepositoryImpl repository;
+
+    @Mock
+    DirectorMapperImpl mapper;
+
     @InjectMocks
     DirectorServlet servlet;
 
@@ -84,17 +91,20 @@ class DirectorServletTest {
     @Test
     @Order(1)
     void doGet() throws IOException, ServletException {
-
-
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        HttpServletResponse response = mock(HttpServletResponse.class);
-
-        when(request.getParameter("id")).thenReturn("550e8400-e29b-41d4-a716-446655440000");
+        when(repository.findById(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")))
+                .thenReturn(Optional.of(new Director(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA")));
 
         DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
 
+        when(mapper.toDTO(any(Director.class)))
+                .thenReturn(director1);
 
-        when(service.findEntityById(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"))).thenReturn(Optional.of(director1));
+        when(service.findEntityById(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")))
+                .thenReturn(Optional.of(director1));
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(request.getParameter("id")).thenReturn("550e8400-e29b-41d4-a716-446655440000");
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -110,23 +120,27 @@ class DirectorServletTest {
 
 
     }
-    /*
+
     @Test
     @Order(2)
     void doGetAll() throws IOException, ServletException {
 
+        DirectorDTO directorDto1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
+        DirectorDTO directorDto2 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440001"), "Christopher", "Nolan", "UK");
+        List<DirectorDTO> dtos = List.of(directorDto1, directorDto2);
+
+        Director director1 = new Director(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
+        Director director2 = new Director(UUID.fromString("550e8400-e29b-41d4-a716-446655440001"), "Christopher", "Nolan", "UK");
+        List<Director> ents = List.of(director1, director2);
+
+        when(repository.findAll()).thenReturn(ents);
+
+        when(service.findAllEntity()).thenReturn(dtos);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
         when(request.getParameter("id")).thenReturn(null);
-
-        DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
-        DirectorDTO director2 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440001"), "Christopher", "Nolan", "UK");
-
-
-        List<DirectorDTO> dtos = List.of(director1, director2);
-        when(service.findAllEntity()).thenReturn(dtos);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -145,7 +159,48 @@ class DirectorServletTest {
 
     @Test
     @Order(3)
+    void doGetNotFound() throws IOException, ServletException {
+        when(repository.findById(UUID.fromString("550e8400-e29b-41d4-a716-446655440003")))
+                .thenReturn(Optional.empty());
+        DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
+
+        when(mapper.toDTO(any(Director.class)))
+                .thenReturn(new DirectorDTO(null,null,null,null));
+
+        when(service.findEntityById(UUID.fromString("550e8400-e29b-41d4-a716-446655440003")))
+                .thenReturn(Optional.empty());
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        when(request.getParameter("id")).thenReturn("550e8400-e29b-41d4-a716-446655440003");
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        when(response.getWriter()).thenReturn(pw);
+
+
+        servlet.doGet(request, response);
+
+        verify(response).setContentType("application/json");
+
+        assertEquals("{\"error\": \"Director not found\"}", sw.toString());
+
+
+    }
+
+    @Test
+    @Order(4)
     void doPost() throws IOException, ServletException {
+
+        when(repository.create(new Director("Steven","Spielberg","USA"))).thenReturn(true);
+        when(mapper.toDTO(any(Director.class)))
+                .thenReturn(new DirectorDTO(
+                        UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
+                        "Steven", "Spielberg", "USA"));
+
+        when(service.createEntity(new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA")))
+                .thenReturn(true);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -153,10 +208,6 @@ class DirectorServletTest {
         StringReader reader = new StringReader("{\"name\":\"Steven\", \"lastName\":\"Spielberg\", \"country\":\"USA\"}");
 
         when(request.getReader()).thenReturn(new BufferedReader(reader));
-
-        DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
-
-        when(service.createEntity(director1)).thenReturn(true);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -173,8 +224,44 @@ class DirectorServletTest {
     }
 
     @Test
-    @Order(4)
+    @Order(5)
+    void doPostFail() throws IOException, ServletException {
+
+        Director director = new Director("Steven", "Spielberg", "USA");
+        DirectorDTO directorDTO = new DirectorDTO(
+                UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
+                "Steven", "Spielberg", "USA"
+        );
+
+        when(repository.create(eq(director))).thenReturn(false);
+        when(mapper.toDTO(eq(director))).thenReturn(directorDTO);
+        when(service.createEntity(eq(directorDTO))).thenReturn(false);
+
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+
+        StringReader reader = new StringReader("{\"name\":\"Steven\", \"lastName\":\"Spielberg\", \"country\":\"USA\"}");
+
+        when(request.getReader()).thenReturn(new BufferedReader(reader));
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+
+        when(response.getWriter()).thenReturn(pw);
+
+
+        servlet.doPost(request,response);
+
+        verify(response).setContentType("application/json");
+
+        assertEquals("{\"error\": \"Failed to create director\"}",sw.toString());
+
+    }
+
+    @Test
+    @Order(5)
     void doPut() throws IOException, ServletException {
+        when(repository.update(new Director("Steven","Spielberg","USA"))).thenReturn(true);
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -202,7 +289,7 @@ class DirectorServletTest {
 
         assertEquals("{\"message\": \"Director updated successfully\"}",sw.toString());
     }
-
+/*
     @Test
     @Order(5)
     void doDelete() throws ServletException, IOException {
@@ -231,30 +318,30 @@ class DirectorServletTest {
     @Order(6)
     void doPostNoSave() throws IOException, ServletException {
 
-        // Мокируем запрос и ответ
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅ
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
-        // Подготавливаем JSON для входящих данных
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ JSON пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         StringReader reader = new StringReader("{\"name\":\"Steven\", \"lastName\":\"Spielberg\", \"country\":\"USA\"}");
         when(request.getReader()).thenReturn(new BufferedReader(reader));
 
-        // Замокировать поведение сервиса
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         when(service.createEntity(any(DirectorDTO.class))).thenReturn(false);
 
-        // Мокируем writer для ответа
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ writer пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         when(response.getWriter()).thenReturn(pw);
 
-        // Вызываем doPost
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ doPost
         servlet.doPost(request, response);
 
-        // Проверяем заголовок ответа
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
         verify(response).setContentType("application/json");
 
-        // Проверяем содержимое ответа
-        pw.flush(); // Обязательно сбрасываем writer
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+        pw.flush(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ writer
         assertEquals("{\"error\": \"Failed to create director\"}", sw.toString());
     }
 
