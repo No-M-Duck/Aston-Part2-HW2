@@ -42,7 +42,7 @@ class MovieServiceImplTest {
         when(movieMapper.toEntity(movieDTO)).thenReturn(movie);
         when(movieRepository.create(movie)).thenReturn(true);
 
-        assertTrue(movieService.createEntity(movieDTO));
+        assertTrue(movieService.create(movieDTO));
 
         verify(movieMapper,times(1)).toEntity(movieDTO);
         verify(movieRepository,times(1)).create(movie);
@@ -60,10 +60,10 @@ class MovieServiceImplTest {
         when(movieRepository.findById(movieId)).thenReturn(Optional.of(movie));
         when(movieMapper.toDTO(movie)).thenReturn(movieDTO);
 
-        Optional<MovieDTO> result = movieService.findEntityById(movieId);
+        Optional<MovieDTO> result = movieService.findById(movieId);
 
-        assertTrue(result.isPresent(), "Результат не должен быть пустым");
-        assertEquals(movieDTO, result.get(), "Возвращенный объект DTO должен совпадать с ожидаемым");
+        assertTrue(result.isPresent(), "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ");
+        assertEquals(movieDTO, result.get(), "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ DTO пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ");
 
         verify(movieRepository, times(1)).findById(movieId);
         verify(movieMapper, times(1)).toDTO(movie);
@@ -74,7 +74,7 @@ class MovieServiceImplTest {
 
         when(movieRepository.findById(movieId)).thenReturn(Optional.empty());
 
-        Optional<MovieDTO> result = movieService.findEntityById(movieId);
+        Optional<MovieDTO> result = movieService.findById(movieId);
 
         assertTrue(result.isEmpty());
         assertTrue(result.isEmpty());
@@ -88,7 +88,7 @@ class MovieServiceImplTest {
 
         when(movieRepository.findById(movieId)).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class, ()-> movieService.findEntityById(movieId));
+        Exception exception = assertThrows(RuntimeException.class, ()-> movieService.findById(movieId));
 
         assertEquals("Database error", exception.getMessage());
 
@@ -115,7 +115,7 @@ class MovieServiceImplTest {
         when(movieMapper.toDTO(movie1)).thenReturn(movieDTO1);
         when(movieMapper.toDTO(movie2)).thenReturn(movieDTO2);
 
-        List<MovieDTO> result = movieService.findAllEntity();
+        List<MovieDTO> result = movieService.findAll();
 
         assertEquals(2, result.size());
         assertEquals(movieDTO1, result.get(0));
@@ -131,7 +131,7 @@ class MovieServiceImplTest {
     void findAllEntity_ShouldReturnListEmpty() {
         when(movieRepository.findAll()).thenReturn(new ArrayList<>());
 
-        assertTrue(movieService.findAllEntity().isEmpty());
+        assertTrue(movieService.findAll().isEmpty());
 
         verify(movieRepository,times(1)).findAll();
     }
@@ -140,7 +140,7 @@ class MovieServiceImplTest {
     void findAllEntity_ShouldThrowException() {
         when(movieRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class,()-> movieService.findAllEntity());
+        Exception exception = assertThrows(RuntimeException.class,()-> movieService.findAll());
 
         assertEquals("Database error",exception.getMessage());
 
@@ -161,7 +161,7 @@ class MovieServiceImplTest {
         when(movieRepository.update(movie)).thenReturn(true);
 
 
-        assertTrue(movieService.updateEntity(movieDTO));
+        assertTrue(movieService.update(movieDTO));
 
         verify(movieRepository,times(1)).update(movie);
         verify(movieMapper, times(1)).toEntity(movieDTO);
@@ -181,7 +181,7 @@ class MovieServiceImplTest {
         when(movieRepository.update(movie)).thenReturn(false);
 
 
-        assertFalse(movieService.updateEntity(movieDTO));
+        assertFalse(movieService.update(movieDTO));
 
         verify(movieRepository,times(1)).update(movie);
         verify(movieMapper, times(1)).toEntity(movieDTO);
@@ -198,7 +198,7 @@ class MovieServiceImplTest {
         when(movieMapper.toEntity(movieDTO)).thenReturn(movie);
         when(movieRepository.update(movie)).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> movieService.updateEntity(movieDTO));
+        Exception exception = assertThrows(RuntimeException.class, () -> movieService.update(movieDTO));
 
         assertEquals("Database error", exception.getMessage());
 
@@ -212,7 +212,7 @@ class MovieServiceImplTest {
 
         when(movieRepository.delete(movieId)).thenReturn(true);
 
-        boolean result = movieService.deleteEntity(movieId);
+        boolean result = movieService.delete(movieId);
 
         assertTrue(result);
 
@@ -225,7 +225,7 @@ class MovieServiceImplTest {
 
         when(movieRepository.delete(movieId)).thenReturn(false);
 
-        boolean result = movieService.deleteEntity(movieId);
+        boolean result = movieService.delete(movieId);
 
         assertFalse(result);
 
@@ -237,7 +237,7 @@ class MovieServiceImplTest {
 
         when(movieRepository.delete(movieId)).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class,()-> movieService.deleteEntity(movieId));
+        Exception exception = assertThrows(RuntimeException.class,()-> movieService.delete(movieId));
 
         verify(movieRepository,times(1)).delete(movieId);
     }

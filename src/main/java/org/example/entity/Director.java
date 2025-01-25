@@ -1,5 +1,7 @@
 package org.example.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -9,18 +11,31 @@ public class Director {
     private String lastName;
     private String country;
 
+    private List<Movie> movies;
+
     // Конструктор
     public Director(UUID id, String name, String lastName, String country) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.country = country;
+        movies = new ArrayList<>();
     }
     public Director(String name, String lastName, String country) {
         this.name = name;
         this.lastName = lastName;
         this.country = country;
+        movies = new ArrayList<>();
     }
+
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
+    public void setMovies(List<Movie> movies) {
+        this.movies = movies;
+    }
+
     // Геттеры и сеттеры
     public UUID getId() {
         return id;

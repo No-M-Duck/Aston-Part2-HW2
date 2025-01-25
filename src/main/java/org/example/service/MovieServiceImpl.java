@@ -24,31 +24,31 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public boolean createEntity(MovieDTO dto) {
+    public boolean create(MovieDTO dto) {
         Movie movie = mapper.toEntity(dto);
         return movieRepositoryImpl.create(movie);
     }
 
     @Override
-    public Optional<MovieDTO> findEntityById(UUID id) {
+    public Optional<MovieDTO> findById(UUID id) {
         return movieRepositoryImpl.findById(id).map(mapper::toDTO);
     }
 
     @Override
-    public List<MovieDTO> findAllEntity() {
+    public List<MovieDTO> findAll() {
         return movieRepositoryImpl.findAll().stream()
                 .map(mapper::toDTO)
                 .toList();
     }
 
     @Override
-    public boolean updateEntity(MovieDTO dto) {
+    public boolean update(MovieDTO dto) {
         Movie movie = mapper.toEntity(dto);
         return movieRepositoryImpl.update(movie);
     }
 
     @Override
-    public boolean deleteEntity(UUID id) {
+    public boolean delete(UUID id) {
         return movieRepositoryImpl.delete(id);
     }
 }

@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface BaseService<T> {
 
-    boolean createEntity(T dto);
+    boolean create(T dto);
 
-    Optional<T> findEntityById(UUID id);
+    Optional<T> findById(UUID id);
 
-    List<T> findAllEntity();
+    List<T> findAll();
 
-    boolean updateEntity(T dto);
+    boolean update(T dto);
 
-    boolean deleteEntity(UUID id);
+    boolean delete(UUID id);
 }

@@ -44,7 +44,7 @@ class DirectorServiceImplTest {
         when(directorMapper.toEntity(directorDTO)).thenReturn(director);
         when(directorRepository.create(director)).thenReturn(true);
 
-        boolean result = directorService.createEntity(directorDTO);
+        boolean result = directorService.create(directorDTO);
 
         assertTrue(result);
 
@@ -61,7 +61,7 @@ class DirectorServiceImplTest {
         when(directorRepository.findById(directorId)).thenReturn(Optional.of(director));
         when(directorMapper.toDTO(director)).thenReturn(directorDTO);
 
-        Optional<DirectorDTO> result = directorService.findEntityById(directorId);
+        Optional<DirectorDTO> result = directorService.findById(directorId);
 
         assertTrue(result.isPresent());
         assertEquals(directorDTO, result.get());
@@ -76,7 +76,7 @@ class DirectorServiceImplTest {
 
         when(directorRepository.findById(directorId)).thenReturn(Optional.empty());
 
-        Optional<DirectorDTO> result = directorService.findEntityById(directorId);
+        Optional<DirectorDTO> result = directorService.findById(directorId);
 
         assertTrue(result.isEmpty());
 
@@ -90,7 +90,7 @@ class DirectorServiceImplTest {
 
         when(directorRepository.findById(directorId)).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class,()-> directorService.findEntityById(directorId));
+        Exception exception = assertThrows(RuntimeException.class,()-> directorService.findById(directorId));
 
         assertEquals("Database error", exception.getMessage());
 
@@ -112,7 +112,7 @@ class DirectorServiceImplTest {
 
         List<DirectorDTO> result = List.of(directorDTO1, directorDTO2);
 
-        assertEquals(result.size(), directorService.findAllEntity().size());
+        assertEquals(result.size(), directorService.findAll().size());
         assertEquals(directorDTO1, result.get(0));
         assertEquals(directorDTO2, result.get(1));
 
@@ -123,7 +123,7 @@ class DirectorServiceImplTest {
 
         when(directorRepository.findAll()).thenReturn(new ArrayList<Director>());
 
-        List<DirectorDTO> result = directorService.findAllEntity();
+        List<DirectorDTO> result = directorService.findAll();
 
         assertTrue(result.isEmpty());
 
@@ -136,7 +136,7 @@ class DirectorServiceImplTest {
 
         when(directorRepository.findAll()).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class,()-> directorService.findAllEntity());
+        Exception exception = assertThrows(RuntimeException.class,()-> directorService.findAll());
 
         assertEquals("Database error", exception.getMessage());
 
@@ -153,7 +153,7 @@ class DirectorServiceImplTest {
         when(directorRepository.update(director)).thenReturn(true);
         when(directorMapper.toEntity(directorDTO)).thenReturn(director);
 
-        assertTrue(directorService.updateEntity(directorDTO));
+        assertTrue(directorService.update(directorDTO));
 
         verify(directorMapper, times(1)).toEntity(directorDTO);
         verify(directorRepository, times(1)).update(director);
@@ -169,7 +169,7 @@ class DirectorServiceImplTest {
         when(directorRepository.update(director)).thenReturn(false);
         when(directorMapper.toEntity(directorDTO)).thenReturn(director);
 
-        assertFalse(directorService.updateEntity(directorDTO));
+        assertFalse(directorService.update(directorDTO));
 
         verify(directorMapper, times(1)).toEntity(directorDTO);
         verify(directorRepository, times(1)).update(director);
@@ -185,7 +185,7 @@ class DirectorServiceImplTest {
         when(directorMapper.toEntity(directorDTO)).thenReturn(director);
         when(directorRepository.update(director)).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> directorService.updateEntity(directorDTO));
+        Exception exception = assertThrows(RuntimeException.class, () -> directorService.update(directorDTO));
 
         assertEquals("Database error", exception.getMessage());
 
@@ -200,7 +200,7 @@ class DirectorServiceImplTest {
 
         when(directorRepository.delete(directorId)).thenReturn(true);
 
-        assertTrue(directorService.deleteEntity(directorId));
+        assertTrue(directorService.delete(directorId));
 
         verify(directorRepository, times(1)).delete(directorId);
     }
@@ -211,7 +211,7 @@ class DirectorServiceImplTest {
 
         when(directorRepository.delete(directorId)).thenReturn(false);
 
-        assertFalse(directorService.deleteEntity(directorId));
+        assertFalse(directorService.delete(directorId));
 
         verify(directorRepository, times(1)).delete(directorId);
     }
@@ -222,7 +222,7 @@ class DirectorServiceImplTest {
 
         when(directorRepository.delete(directorId)).thenThrow(new RuntimeException("Database error"));
 
-        Exception exception = assertThrows(RuntimeException.class, () -> directorService.deleteEntity(directorId));
+        Exception exception = assertThrows(RuntimeException.class, () -> directorService.delete(directorId));
 
         assertEquals("Database error", exception.getMessage());
 

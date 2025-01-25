@@ -20,29 +20,40 @@ public class DirectorServiceImpl implements DirectorService {
         this.directorMapper = directorMapper;
     }
 
-    public boolean createEntity(DirectorDTO directorDTO) {
+    public boolean create(DirectorDTO directorDTO) {
         Director director = directorMapper.toEntity(directorDTO);
         return directorRepository.create(director);
     }
 
-    public Optional<DirectorDTO> findEntityById(UUID id) {
+    public Optional<DirectorDTO> findById(UUID id) {
         return directorRepository.findById(id).map(directorMapper::toDTO);
     }
 
-    public List<DirectorDTO> findAllEntity() {
+    public List<DirectorDTO> findAll() {
         return directorRepository.findAll()
                 .stream()
                 .map(directorMapper::toDTO)
                 .toList();
     }
 
-    public boolean updateEntity(DirectorDTO directorDTO) {
+    public boolean update(DirectorDTO directorDTO) {
         Director director = directorMapper.toEntity(directorDTO);
         return directorRepository.update(director);
     }
 
 
-    public boolean deleteEntity(UUID id) {
+    public boolean delete(UUID id) {
         return directorRepository.delete(id);
+    }
+
+    @Override
+    public List<DirectorDTO> findAllWithFilms() {
+        return  directorRepository.findAllWithFilms().stream().map(directorMapper::toDTO).toList();
+    }
+
+    @Override
+    public DirectorDTO findByIdWithFilm(UUID id) {
+        Director director = directorRepository.findByIdWithFilm(id);
+        return directorMapper.toDTO(director);
     }
 }

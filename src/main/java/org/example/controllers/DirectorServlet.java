@@ -1,6 +1,5 @@
 package org.example.controllers;
 import com.google.gson.Gson;
-import org.example.database.DataSource;
 import org.example.dto.DirectorDTO;
 import org.example.mapper.DirectorMapperImpl;
 import org.example.repository.DirectorRepositoryImpl;
@@ -37,12 +36,12 @@ public class DirectorServlet extends HttpServlet {
         try {
             if (directorId == null) {
                 // Получение всех режиссеров
-                List<DirectorDTO> directors = directorServiceImpl.findAllEntity();
+                List<DirectorDTO> directors = directorServiceImpl.findAll();
                 resp.getWriter().write(new Gson().toJson(directors));
             } else {
                 // Получение конкретного режиссера
                 UUID id = UUID.fromString(directorId);
-                DirectorDTO director = directorServiceImpl.findEntityById(id)
+                DirectorDTO director = directorServiceImpl.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Director not found"));
                 resp.getWriter().write(new Gson().toJson(director));
             }
@@ -60,7 +59,7 @@ public class DirectorServlet extends HttpServlet {
 
         try {
             DirectorDTO director = new Gson().fromJson(req.getReader(), DirectorDTO.class);
-            boolean created = directorServiceImpl.createEntity(director);
+            boolean created = directorServiceImpl.create(director);
 
             if (created) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -82,7 +81,7 @@ public class DirectorServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         try {
             DirectorDTO director = new Gson().fromJson(req.getReader(), DirectorDTO.class);
-            boolean updated = directorServiceImpl.updateEntity(director);
+            boolean updated = directorServiceImpl.update(director);
 
             if (updated) {
                 resp.getWriter().write("{\"message\": \"Director updated successfully\"}");
@@ -113,7 +112,7 @@ public class DirectorServlet extends HttpServlet {
             String directorId = pathInfo.substring(1); // Убирает начальный "/"
             UUID id = UUID.fromString(directorId);
 
-            boolean deleted = directorServiceImpl.deleteEntity(id);
+            boolean deleted = directorServiceImpl.delete(id);
 
             if (deleted) {
                 resp.getWriter().write("{\"message\": \"Director deleted successfully\"}");

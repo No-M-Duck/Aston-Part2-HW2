@@ -2,19 +2,15 @@ package org.example.controllers;
 
 import com.google.gson.Gson;
 import org.example.dto.MovieDTO;
-import org.example.entity.Movie;
 import org.example.service.MovieServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.testcontainers.shaded.org.checkerframework.common.value.qual.EnsuresMinLenIf;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -54,7 +49,7 @@ class MovieServletTest {
 
         List<MovieDTO> movies = List.of(movie);
 
-        when(service.findAllEntity()).thenReturn(movies);
+        when(service.findAll()).thenReturn(movies);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -76,7 +71,7 @@ class MovieServletTest {
     void doGetEntity() throws IOException, ServletException {
         MovieDTO movie = new MovieDTO(null, null, "The Terminal", LocalDate.of(2004, 6, 18), 128, 6);
 
-        when(service.findEntityById(any())).thenReturn(Optional.of(movie));
+        when(service.findById(any())).thenReturn(Optional.of(movie));
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -99,7 +94,7 @@ class MovieServletTest {
 
         MovieDTO movie = new MovieDTO(null, null, "The Terminal", LocalDate.of(2004, 6, 18), 128, 6);
 
-        when(service.createEntity(any())).thenReturn(true);
+        when(service.create(any())).thenReturn(true);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -121,7 +116,7 @@ class MovieServletTest {
 
     @Test
     void doPostFail() throws IOException, ServletException {
-        when(service.createEntity(any())).thenReturn(false);
+        when(service.create(any())).thenReturn(false);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -143,7 +138,7 @@ class MovieServletTest {
 
     @Test
     void doPut() throws IOException, ServletException {
-        when(service.updateEntity(any())).thenReturn(true);
+        when(service.update(any())).thenReturn(true);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -165,7 +160,7 @@ class MovieServletTest {
 
     @Test
     void doPutFail() throws IOException, ServletException {
-        when(service.updateEntity(any())).thenReturn(false);
+        when(service.update(any())).thenReturn(false);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -192,7 +187,7 @@ class MovieServletTest {
 
         when(request.getPathInfo()).thenReturn("/550e8400-e29b-41d4-a716-446655440000");
 
-        when(service.deleteEntity(any())).thenReturn(true);
+        when(service.delete(any())).thenReturn(true);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -213,7 +208,7 @@ class MovieServletTest {
 
         when(request.getPathInfo()).thenReturn("/550e8400-e29b-41d4-a716-446655440000");
 
-        when(service.deleteEntity(any())).thenReturn(false);
+        when(service.delete(any())).thenReturn(false);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

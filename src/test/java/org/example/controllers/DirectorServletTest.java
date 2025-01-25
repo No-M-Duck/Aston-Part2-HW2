@@ -2,14 +2,7 @@ package org.example.controllers;
 
 import com.google.gson.Gson;
 
-import com.zaxxer.hikari.HikariConfig;
-import org.example.database.DataSource;
-import org.example.database.DbUtils;
 import org.example.dto.DirectorDTO;
-import org.example.entity.Director;
-import org.example.mapper.DirectorMapper;
-import org.example.mapper.DirectorMapperImpl;
-import org.example.repository.DirectorRepositoryImpl;
 import org.example.service.DirectorServiceImpl;
 
 import org.junit.jupiter.api.*;
@@ -20,7 +13,6 @@ import org.mockito.Mock;
 
 
 import java.io.*;
-import java.time.Duration;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -36,9 +28,6 @@ import static org.mockito.Mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.utility.DockerImageName;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -65,7 +54,7 @@ class DirectorServletTest {
     void doGet() throws IOException, ServletException {
         DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Steven", "Spielberg", "USA");
 
-        when(service.findEntityById(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")))
+        when(service.findById(UUID.fromString("550e8400-e29b-41d4-a716-446655440000")))
                 .thenReturn(Optional.of(director1));
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -96,7 +85,7 @@ class DirectorServletTest {
         List<DirectorDTO> dtos = List.of(directorDto1, directorDto2);
 
 
-        when(service.findAllEntity()).thenReturn(dtos);
+        when(service.findAll()).thenReturn(dtos);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -121,7 +110,7 @@ class DirectorServletTest {
     @Test
     @Order(3)
     void doGetNotFound() throws IOException, ServletException {
-        when(service.findEntityById(UUID.fromString("550e8400-e29b-41d4-a716-446655440003")))
+        when(service.findById(UUID.fromString("550e8400-e29b-41d4-a716-446655440003")))
                 .thenReturn(Optional.empty());
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -147,7 +136,7 @@ class DirectorServletTest {
     @Order(4)
     void doPost() throws IOException, ServletException {
 
-        when(service.createEntity(any()))
+        when(service.create(any()))
                 .thenReturn(true);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
@@ -178,7 +167,7 @@ class DirectorServletTest {
                 UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
                 "Steven", "Spielberg", "USA"
         );
-        when(service.createEntity(any())).thenReturn(false);
+        when(service.create(any())).thenReturn(false);
 
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -220,7 +209,7 @@ class DirectorServletTest {
 
         DirectorDTO director1 = new DirectorDTO(UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),"Quentin", "Tarantino", "USA");
 
-        when(service.updateEntity(director1)).thenReturn(true);
+        when(service.update(director1)).thenReturn(true);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -249,7 +238,7 @@ class DirectorServletTest {
 
         when(request.getReader()).thenReturn(new BufferedReader(reader));
 
-        when(service.updateEntity(any())).thenReturn(false);
+        when(service.update(any())).thenReturn(false);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -272,7 +261,7 @@ class DirectorServletTest {
 
         when(request.getPathInfo()).thenReturn("/550e8400-e29b-41d4-a716-446655440000");
 
-        when(service.deleteEntity(any())).thenReturn(true);
+        when(service.delete(any())).thenReturn(true);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
@@ -295,7 +284,7 @@ class DirectorServletTest {
 
         when(request.getPathInfo()).thenReturn("/550e8400-e29b-41d4-a716-446655440000");
 
-        when(service.deleteEntity(any())).thenReturn(false);
+        when(service.delete(any())).thenReturn(false);
 
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);

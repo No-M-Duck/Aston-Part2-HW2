@@ -46,12 +46,12 @@ public class MovieServlet extends HttpServlet {
         try {
             if (movieId == null) {
                 // Получение всех фильмов
-                List<MovieDTO> movies = movieServiceImpl.findAllEntity();
+                List<MovieDTO> movies = movieServiceImpl.findAll();
                 resp.getWriter().write(gson.toJson(movies));
             } else {
                 // Получение фильма по ID
                 UUID id = UUID.fromString(movieId);
-                MovieDTO movie = movieServiceImpl.findEntityById(id)
+                MovieDTO movie = movieServiceImpl.findById(id)
                         .orElseThrow(() -> new IllegalArgumentException("Movie not found"));
                 resp.getWriter().write(gson.toJson(movie));
             }
@@ -67,7 +67,7 @@ public class MovieServlet extends HttpServlet {
 
         try {
             MovieDTO movieDTO = gson.fromJson(req.getReader(), MovieDTO.class);
-            boolean created = movieServiceImpl.createEntity(movieDTO);
+            boolean created = movieServiceImpl.create(movieDTO);
             if (created) {
                 resp.setStatus(HttpServletResponse.SC_CREATED);
                 resp.getWriter().write("{\"message\": \"Movie created successfully\"}");
@@ -87,7 +87,7 @@ public class MovieServlet extends HttpServlet {
 
         try {
             MovieDTO movieDTO = gson.fromJson(req.getReader(), MovieDTO.class);
-            boolean updated = movieServiceImpl.updateEntity(movieDTO);
+            boolean updated = movieServiceImpl.update(movieDTO);
             if (updated) {
                 resp.getWriter().write("{\"message\": \"Movie updated successfully\"}");
             } else {
@@ -114,7 +114,7 @@ public class MovieServlet extends HttpServlet {
             String movieId = pathInfo.substring(1);
             UUID id = UUID.fromString(movieId);
 
-            boolean deleted = movieServiceImpl.deleteEntity(id);
+            boolean deleted = movieServiceImpl.delete(id);
 
             if (deleted) {
                 resp.getWriter().write("{\"message\": \"Movie deleted successfully\"}");

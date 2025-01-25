@@ -1,5 +1,9 @@
 package org.example.dto;
 
+import org.example.entity.Movie;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -9,12 +13,23 @@ public class DirectorDTO {
     private String lastName;
     private String country;
 
+    private List<Movie> movies;
+
+    public List<Movie> getMovies() {
+        return movies;
+    }
+
+    public void setMovies(List<Movie> movies) {
+        this.movies = movies;
+    }
+
     // Конструктор
     public DirectorDTO(UUID id, String name, String lastName, String country) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
         this.country = country;
+        movies = new ArrayList<>();
     }
 
     // Геттеры и сеттеры
